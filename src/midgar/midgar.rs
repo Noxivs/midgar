@@ -15,18 +15,18 @@ pub mod game_state;
 pub mod menu;
 
 fn create_window() -> RenderWindow {
-	let setting = ContextSettings::default();
+    let setting = ContextSettings::default();
 
     match RenderWindow::new(VideoMode::new_init(512, 512, 32),
                                              "Midgar",
                                              Close,
                                              &setting) {
-    	Some(mut render_window) => {
-    		render_window.set_framerate_limit(60);
-    		render_window.set_mouse_cursor_visible(false);
-    		render_window 
-    	},
-    	None => fail!("Cannot create a new Render Window.")
+        Some(mut render_window) => {
+            render_window.set_framerate_limit(60);
+            render_window.set_mouse_cursor_visible(false);
+            render_window 
+        },
+        None => fail!("Cannot create a new Render Window.")
     }
 }
 
@@ -49,7 +49,11 @@ fn start(argc: int, argv: **u8) -> int {
 fn main () -> () {
     let resource_loader = load_resources();
     let render_window = create_window();
-	let mut game_loop = game_loop::GameLoop::new(render_window, &resource_loader);
-    game_loop.push_game_state(box game_state::GameState::new(box menu::Menu::new(&resource_loader) as Box<game_state::Viewable>));
-	game_loop.run();
+    let mut game_loop = game_loop::GameLoop::new(render_window, &resource_loader);
+    game_loop.push_game_state(
+        box game_state::GameState::new(
+            box menu::Menu::new(&resource_loader) as Box<game_state::Viewable>
+            ));
+
+    game_loop.run();
 }
