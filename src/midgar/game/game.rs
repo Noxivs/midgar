@@ -1,5 +1,6 @@
 use rsfml::graphics::{RenderWindow};
 
+use event_handler::EventHandler;
 use game_state::Viewable;
 use resource_loader::ResourceLoader;
 
@@ -14,7 +15,7 @@ impl<'s> Game<'s> {
 }
 
 impl<'s> Viewable for Game<'s> {
-    fn update(&self, render_window: &mut RenderWindow) -> Option<i32> {
+    fn update(&self, render_window: &mut RenderWindow, event_handler: &EventHandler) -> Option<i32> {
         None
     }
 

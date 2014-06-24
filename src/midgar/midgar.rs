@@ -2,6 +2,8 @@
 #![desc = "rust version of midgar project (nami-doc's project in C)"]
 #![crate_type = "bin"]
 
+#![feature(globs)]
+
 extern crate rsfml;
 
 use std::cell::RefCell;
@@ -9,9 +11,10 @@ use std::cell::RefCell;
 use rsfml::window::{ContextSettings, VideoMode, Close};
 use rsfml::graphics::{RenderWindow};
 
+pub mod event_handler;
 pub mod game_loop;
-pub mod resource_loader;
 pub mod game_state;
+pub mod resource_loader;
 
 #[path="./menu/menu.rs"]
 pub mod menu;
@@ -41,8 +44,12 @@ fn create_window() -> RenderWindow {
 fn load_resources() -> resource_loader::ResourceLoader {
     let mut resource_loader = resource_loader::ResourceLoader::new();
     if 
-    resource_loader.load_texture("../../res/welcome.jpg".to_string()) == false ||   //00
-    resource_loader.load_texture("../../res/texture.jpg".to_string()) == false      //01
+        resource_loader.load_texture("../../res/welcome.jpg".to_string()) == false      ||  //00
+        resource_loader.load_texture("../../res/texture.jpg".to_string()) == false      ||  //01
+        resource_loader.load_texture("../../res/clerc.gif".to_string()) == false        ||  //02
+        resource_loader.load_texture("../../res/magician.gif".to_string()) == false     ||  //03
+        resource_loader.load_texture("../../res/ninja.gif".to_string()) == false        ||  //04
+        resource_loader.load_texture("../../res/warrior.gif".to_string()) == false          //05
     {
         fail!("Error load textures");
     }
@@ -61,13 +68,13 @@ fn main () -> () {
     let render_window = create_window();
     let mut game_loop = game_loop::GameLoop::new(render_window, &resource_loader);
 
-    let mut first_state = RefCell::new(game_state::GameState::new(
+    let mut first_state = game_state::GameState::new(
             box menu::Menu::new(&resource_loader) as Box<game_state::Viewable>
-        ));
+        );
 
-    first_state.borrow_mut().deref_mut().set_enabled(true);
+    first_state.set_enabled(true);
 
-    game_loop.push_game_state(first_state);
+    game_loop.push_game_state(RefCell::new(first_state));
 
     game_loop.push_game_state(RefCell::new(game_state::GameState::new(
             box character::Character::new(&resource_loader) as Box<game_state::Viewable>

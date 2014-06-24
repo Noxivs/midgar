@@ -5,14 +5,17 @@ use rsfml::graphics::{RenderWindow, RectangleShape, Color};
 use rsfml::window::{event};
 use rsfml::system::{Vector2f};
 
+
+use event_handler::EventHandler;
 use resource_loader::ResourceLoader;
-use game_state::{GameState};
+use game_state::GameState;
 
 pub struct GameLoop<'s> {
     render_window: RenderWindow,
     clear_color: Color,
-    resource_loader: &'s ResourceLoader,
-    game_states: Vec<RefCell<GameState>>
+    event_handler: EventHandler,
+    game_states: Vec<RefCell<GameState>>,
+    resource_loader: &'s ResourceLoader
 }
 
 impl<'s>  GameLoop<'s>  {
@@ -20,8 +23,9 @@ impl<'s>  GameLoop<'s>  {
         GameLoop {
             render_window: render_window,
             clear_color : Color::new_RGB(100, 100, 100),
-            resource_loader: resource_loader,
-            game_states: Vec::new()
+            event_handler: EventHandler::new(),
+            game_states: Vec::new(),
+            resource_loader: resource_loader
         }
     }
 
@@ -32,19 +36,16 @@ impl<'s>  GameLoop<'s>  {
 
     fn update(&mut self) -> () {
 
-        loop {
-            match self.render_window.poll_event() {
-                event::Closed   => self.render_window.close(),
-                event::NoEvent  => break,
-                _               => {}
-                }
+        self.event_handler.update_events(&mut self.render_window);
+        if self.event_handler.has_closed_event() {
+            self.render_window.close();
         }
 
         for game_state in self.game_states.iter() {
-            if game_state.borrow().deref().get_enabled() {
-                match game_state.borrow_mut().deref_mut().update(&mut self.render_window) {
+            if game_state.borrow().get_enabled() {
+                match game_state.borrow_mut().update(&mut self.render_window, &self.event_handler) {
                     Some(index)  => {
-                        self.game_states.get(index as uint).borrow_mut().deref_mut().set_enabled(true);
+                        self.game_states.get(index as uint).borrow_mut().set_enabled(true);
                     }
                     None => { }
                 }
@@ -56,8 +57,8 @@ impl<'s>  GameLoop<'s>  {
         self.render_window.clear(&self.clear_color);
 
         for game_state in self.game_states.iter() {
-            if game_state.borrow().deref().get_enabled() {
-                game_state.borrow_mut().deref_mut().draw(&mut self.render_window);
+            if game_state.borrow().get_enabled() {
+                game_state.borrow_mut().draw(&mut self.render_window);
             }
         }
 

@@ -1,12 +1,15 @@
 use rsfml::graphics::{RenderWindow};
 
+use event_handler::EventHandler;
+use rsfml::window::keyboard;
+
 pub struct GameState {
     view: Box<Viewable>,
     enabled: bool
 }
 
 pub trait Viewable {
-    fn update(&self, render_window: &mut RenderWindow) -> Option<i32>; /* return new state index or nothing*/
+    fn update(&self, render_window: &mut RenderWindow, event_handler: &EventHandler) -> Option<i32>; /* return new state index or nothing*/
     fn draw(&self, render_window: &mut RenderWindow) -> ();
 }
 
@@ -18,8 +21,8 @@ impl GameState {
         }
     }
 
-    pub fn update(&self, render_window: &mut RenderWindow) -> Option<i32> {
-        self.view.update(render_window)
+    pub fn update(&self, render_window: &mut RenderWindow, event_handler: &EventHandler) -> Option<i32> {
+        self.view.update(render_window, event_handler)
     }
 
     pub fn draw(&self, render_window: &mut RenderWindow) -> () {

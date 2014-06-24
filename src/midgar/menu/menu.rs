@@ -1,6 +1,8 @@
 use rsfml::system::{Vector2f};
 use rsfml::graphics::{RenderWindow, RectangleShape};
+use rsfml::window::keyboard;
 
+use event_handler::EventHandler;
 use game_state::Viewable;
 use resource_loader::ResourceLoader;
 
@@ -20,8 +22,13 @@ impl<'s> Menu<'s> {
 }
 
 impl<'s> Viewable for Menu<'s> {
-    fn update(&self, render_window: &mut RenderWindow) -> Option<i32> {
-        Some(1)
+    fn update(&self, render_window: &mut RenderWindow, event_handler: &EventHandler) -> Option<i32> {
+
+        if event_handler.is_key_pressed(keyboard::Space) {
+            return Some(1)
+        }
+
+        None
     }
 
     fn draw(&self, render_window: &mut RenderWindow) -> () {
